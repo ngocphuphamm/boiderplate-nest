@@ -1,0 +1,16 @@
+FLOW
+Để đảm bảo đồng bộ giữa Database Read (được sử dụng để đọc dữ liệu) và Database Write (được sử dụng để ghi dữ liệu) trong kiến trúc CQRS (Command Query Responsibility Segregation), bạn cần áp dụng các biện pháp và kỹ thuật sau đây:
+
+Sử dụng Event Sourcing: Một trong các phương pháp phổ biến để đảm bảo đồng bộ là sử dụng Event Sourcing cùng với Event Store. Trong Event Sourcing, tất cả các sự kiện (events) thay đổi trạng thái của hệ thống được lưu trữ trong một Event Store. Cả Database Write và Database Read sẽ sử dụng cùng một Event Store để cập nhật và đọc dữ liệu. Bằng cách này, trạng thái của hệ thống trong cả hai phần sẽ được duy trì bằng cách tái áp dụng (replay) các sự kiện từ Event Store.
+
+Cơ chế Publish-Subscribe: Sử dụng mô hình publish-subscribe để thông báo cho Database Read về các thay đổi trong Database Write. Khi một lệnh (command) được thực hiện và dẫn đến thay đổi trạng thái, hãy xuất bản sự kiện (event) liên quan. Database Read sẽ đăng ký để lắng nghe các sự kiện này và cập nhật dữ liệu của mình khi nhận được sự kiện.
+
+Message Brokers và Message Queues: Sử dụng các message broker hoặc message queue để truyền tải các sự kiện từ phần Database Write đến Database Read. Database Write sẽ đặt các sự kiện vào hàng đợi (queue) và Database Read sẽ lấy các sự kiện từ hàng đợi này để cập nhật dữ liệu.
+
+Lập lịch định kỳ (Polling): Database Read có thể thực hiện việc định kỳ (polling) để kiểm tra xem có sự kiện mới nào trong Database Write. Nếu có sự kiện mới, nó sẽ tải và xử lý chúng để cập nhật dữ liệu.
+
+Optimistic Concurrency Control: Sử dụng kiểm soát đồng thời optimistic (Optimistic Concurrency Control) để đảm bảo rằng dữ liệu không bị xung đột khi ghi và đọc đồng thời. Khi ghi dữ liệu, bạn cần kiểm tra xem dữ liệu có bị thay đổi trước khi ghi không. Nếu có xung đột, bạn cần xử lý nó một cách thích hợp.
+
+Eventual Consistency: Trong một số trường hợp, bạn có thể chấp nhận tính nhất quán cuối cùng (eventual consistency). Điều này có nghĩa rằng Database Read có thể không luôn luôn đồng bộ với Database Write ngay lập tức, nhưng sẽ đảm bảo tính nhất quán trong thời gian.
+
+Lựa chọn phương pháp phụ thuộc vào yêu cầu cụ thể của ứng dụng của bạn và mức độ đồng bộ mà bạn cần đạt được giữa Database Read và Database Write.
